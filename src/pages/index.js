@@ -53,6 +53,11 @@ export default function MainPage() {
         ></textarea>
         <button onClick={handleSave}>ذخیره</button>
       </div>
+
+      <div
+        style={{ marginTop: "50px", border: "1px solid #ccc", padding: "10px" }}
+        dangerouslySetInnerHTML={{ __html: editorContent }}
+      />
     </>
   );
 }
