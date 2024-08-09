@@ -59,14 +59,19 @@ const CustomEditor = {
     return !!match;
   },
 
-  insertImage(editor, url, align = "flex-start") {
+  insertImage(
+    editor,
+    url,
+    align = "flex-start",
+    size = { width: "", height: "" }
+  ) {
     if (url && isUrl(url)) {
       const text = { text: "" };
-      const image = { type: "image", url, align, children: [text] };
+      const image = { type: "image", url, align, size, children: [text] };
       Transforms.insertNodes(editor, image);
     } else {
       const text = { text: "" };
-      const image = { type: "image", url: null, align, children: [text] };
+      const image = { type: "image", url: null, align, size, children: [text] };
       Transforms.insertNodes(editor, image);
       console.warn("Invalid URL provided for image insertion");
     }
@@ -113,8 +118,16 @@ const CustomEditor = {
     return !!match;
   },
 };
+const getElementStyles = (align, fontWidth) => ({
+  display: "flex",
+  justifyContent: align || "flex-start",
+  textAlign: align || "left",
+  fontWidth: fontWidth || "normal",
+});
 
 const Element = ({ attributes, children, element }) => {
+  const styles = getElementStyles(element.align, element.fontWidth);
+
   switch (element.type) {
     case "image":
       return (
@@ -130,53 +143,25 @@ const Element = ({ attributes, children, element }) => {
       );
     case "heading-one":
       return (
-        <h1
-          style={{
-            display: "flex",
-            justifyContent: element.align,
-            textAlign: element.align,
-          }}
-          {...attributes}
-        >
+        <h1 style={styles} {...attributes}>
           {children}
         </h1>
       );
     case "heading-two":
       return (
-        <h2
-          style={{
-            display: "flex",
-            justifyContent: element.align,
-            textAlign: element.align,
-          }}
-          {...attributes}
-        >
+        <h2 style={styles} {...attributes}>
           {children}
         </h2>
       );
     case "heading-three":
       return (
-        <h3
-          style={{
-            display: "flex",
-            justifyContent: element.align,
-            textAlign: element.align,
-          }}
-          {...attributes}
-        >
+        <h3 style={styles} {...attributes}>
           {children}
         </h3>
       );
     default:
       return (
-        <p
-          style={{
-            display: "flex",
-            justifyContent: element.align,
-            textAlign: element.align,
-          }}
-          {...attributes}
-        >
+        <p style={styles} {...attributes}>
           {children}
         </p>
       );
@@ -188,6 +173,8 @@ const ImageElement = ({ attributes, children, element }) => {
   const focused = useFocused();
   console.log(element.align);
   const alignment = element.align || "flex-start"; // چپ‌چین پیش‌فرض
+  const { width, height } = element.size || {}; // سایز تصویر
+
   if (!element.url) return null;
 
   return (
@@ -201,6 +188,8 @@ const ImageElement = ({ attributes, children, element }) => {
               display: "block",
               maxWidth: "100%",
               maxHeight: "20em",
+              width: width || "auto", // استفاده از سایز تنظیم شده
+              height: height || "auto", // استفاده از سایز تنظیم شده
               boxShadow: selected && focused ? "0 0 0 3px #B4D5FF" : "none",
             }}
           />
@@ -231,7 +220,58 @@ const Leaf = ({ attributes, children, leaf }) => {
   }
   return <span {...attributes}>{children}</span>;
 };
+const buttonStyle = (isActive) => ({
+  backgroundColor: isActive ? "#007bff" : "#f0f0f0", // رنگ پس‌زمینه
+  color: isActive ? "#fff" : "#000", // رنگ متن
+  border: "1px solid #ccc", // حاشیه
+  borderRadius: "4px", // گوشه‌های گرد
+  padding: "8px 12px", // فاصله داخلی
+  margin: "0 4px", // فاصله بیرونی
+  cursor: "pointer", // نشانگر ماوس
+});
+const selectStyle = (isActive) => ({
+  backgroundColor: "#f0f0f0", // رنگ پس‌زمینه
+  color: "#000", // رنگ متن
+  border: "1px solid #ccc", // حاشیه
+  borderRadius: "4px", // گوشه‌های گرد
+  padding: "8px 12px", // فاصله داخلی
+  margin: "0 4px", // فاصله بیرونی
+  cursor: "pointer", // نشانگر ماوس
+  appearance: "none", // حذف استایل پیش‌فرض مرورگر
+  outline: "none", // حذف حاشیه زمان فوکوس
+  WebkitAppearance: "none", // حذف استایل پیش‌فرض مرورگرهای WebKit
+  MozAppearance: "none", // حذف استایل پیش‌فرض مرورگرهای موزیلا
+});
+const imageButtonStyle = {
+  backgroundColor: "#007bff", // رنگ پس‌زمینه دکمه
+  color: "#fff", // رنگ متن
+  border: "none", // حذف حاشیه
+  borderRadius: "4px", // گوشه‌های گرد
+  padding: "10px 20px", // فاصله داخلی
+  margin: "0 4px", // فاصله بیرونی
+  cursor: "pointer", // نشانگر ماوس
+  fontSize: "16px", // اندازه فونت
+  fontWeight: "bold", // ضخامت فونت
+  display: "flex", // برای مرکز کردن محتویات
+  alignItems: "center", // مرکز کردن محتویات عمودی
+  justifyContent: "center", // مرکز کردن محتویات افقی
+  transition: "background-color 0.3s, box-shadow 0.3s", // انیمیشن برای تغییر رنگ پس‌زمینه و سایه
+  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // سایه دکمه
+};
 
+const imageButtonHoverStyle = {
+  ...imageButtonStyle,
+  backgroundColor: "#0056b3", // رنگ پس‌زمینه هنگام هاور
+  boxShadow: "0 6px 12px rgba(0, 0, 0, 0.2)", // سایه بزرگ‌تر هنگام هاور
+};
+const inputStyle = {
+  border: "1px solid #ccc", // حاشیه
+  borderRadius: "4px", // گوشه‌های گرد
+  padding: "8px", // فاصله داخلی
+  margin: "0 4px", // فاصله بیرونی
+  fontSize: "16px", // اندازه فونت
+  width: "120px", // عرض ثابت
+};
 const withImages = (editor) => {
   const { isVoid } = editor;
   editor.isVoid = (element) =>
@@ -242,10 +282,26 @@ const withImages = (editor) => {
 const SlateEditor = ({ initialValue, setInitialValue }) => {
   const editor = useMemo(() => withImages(withReact(createEditor())), []);
   const [value, setValue] = useState(initialValue);
+  const [imageSize, setImageSize] = useState({ width: "", height: "" }); // برای نگهداری سایز تصویر
+  const headingOptions = [
+    { label: "پاراگراف", value: "paragraph" },
+    { label: "هدینگ 1", value: "heading-one" },
+    { label: "هدینگ 2", value: "heading-two" },
+    { label: "هدینگ 3", value: "heading-three" },
+  ];
 
   const renderElement = useCallback((props) => <Element {...props} />, []);
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
   const fonts = ["Arial", "Georgia", "Times New Roman", "Iransansx"];
+
+  const handleImageInsert = () => {
+    const url = window.prompt("URL تصویر را وارد کنید:");
+    if (!url) return;
+
+    const align = "center";
+    CustomEditor.insertImage(editor, url, align, imageSize);
+    setImageSize({ width: "", height: "" }); // پاک کردن سایز پس از درج تصویر
+  };
 
   return (
     <Slate
@@ -258,6 +314,7 @@ const SlateEditor = ({ initialValue, setInitialValue }) => {
     >
       <div>
         <select
+          style={selectStyle(CustomEditor.isFontMarkActive(editor))}
           onChange={(e) => {
             e.preventDefault();
             const font = e.target.value;
@@ -280,6 +337,7 @@ const SlateEditor = ({ initialValue, setInitialValue }) => {
           }}
         />
         <button
+          style={buttonStyle(CustomEditor.isBoldMarkActive(editor))}
           onMouseDown={(e) => {
             e.preventDefault();
             CustomEditor.toggleBoldMark(editor);
@@ -288,6 +346,7 @@ const SlateEditor = ({ initialValue, setInitialValue }) => {
           پررنگ
         </button>
         <button
+          style={buttonStyle(CustomEditor.isItalicMarkActive(editor))}
           onMouseDown={(e) => {
             e.preventDefault();
             CustomEditor.toggleItalicMark(editor);
@@ -296,14 +355,16 @@ const SlateEditor = ({ initialValue, setInitialValue }) => {
           مورب
         </button>
         <button
+          style={buttonStyle(CustomEditor.isAlignActive(editor, "flex-start"))}
           onMouseDown={(e) => {
             e.preventDefault();
-            CustomEditor.toggleAlign(editor, "flex-end");
+            CustomEditor.toggleAlign(editor, "flex-start");
           }}
         >
           راست‌چین
         </button>
         <button
+          style={buttonStyle(CustomEditor.isAlignActive(editor, "center"))}
           onMouseDown={(e) => {
             e.preventDefault();
             CustomEditor.toggleAlign(editor, "center");
@@ -312,53 +373,66 @@ const SlateEditor = ({ initialValue, setInitialValue }) => {
           وسط‌چین
         </button>
         <button
+          style={buttonStyle(CustomEditor.isAlignActive(editor, "flex-end"))}
           onMouseDown={(e) => {
             e.preventDefault();
-            CustomEditor.toggleAlign(editor, "flex-start");
+            CustomEditor.toggleAlign(editor, "flex-end");
           }}
         >
           چپ‌چین
         </button>
-        <button
-          onMouseDown={(e) => {
-            e.preventDefault();
-            CustomEditor.toggleBlock(editor, "heading-one");
-          }}
-        >
-          Heading 1
-        </button>
-        <button
-          onMouseDown={(e) => {
-            e.preventDefault();
-            CustomEditor.toggleBlock(editor, "heading-two");
-          }}
-        >
-          Heading 2
-        </button>
-        <button
-          onMouseDown={(e) => {
-            e.preventDefault();
-            CustomEditor.toggleBlock(editor, "heading-three");
-          }}
-        >
-          Heading 3
-        </button>
-        <button
-          onMouseDown={(e) => {
-            e.preventDefault();
-            CustomEditor.toggleBlock(editor, "code");
-          }}
-        >
-          Code Block
-        </button>
-        <button
-          onMouseDown={(e) => {
-            e.preventDefault();
-            const url = window.prompt("URL تصویر را وارد کنید:");
-            if (!url) return null;
 
-            const align = "center";
-            CustomEditor.insertImage(editor, url, align);
+        {/* لیست کشویی هدینگ */}
+        <select
+          style={selectStyle(
+            headingOptions.some((option) =>
+              CustomEditor.isBlockActive(editor, option.value)
+            )
+          )}
+          onChange={(e) => {
+            e.preventDefault();
+            const format = e.target.value;
+            CustomEditor.toggleBlock(editor, format);
+          }}
+          value={
+            headingOptions.find((option) =>
+              CustomEditor.isBlockActive(editor, option.value)
+            )?.value || "paragraph"
+          }
+        >
+          {headingOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <div>
+          <input
+            type="number"
+            placeholder="عرض (پیکسل)"
+            value={imageSize.width}
+            onChange={(e) =>
+              setImageSize({ ...imageSize, width: e.target.value })
+            }
+            style={inputStyle}
+          />
+          <input
+            type="number"
+            placeholder="ارتفاع (پیکسل)"
+            value={imageSize.height}
+            onChange={(e) =>
+              setImageSize({ ...imageSize, height: e.target.value })
+            }
+            style={inputStyle}
+          />
+        </div>
+        <button
+          style={imageButtonStyle}
+          onMouseEnter={(e) => (e.currentTarget.style = imageButtonHoverStyle)} // تغییر استایل هنگام هاور
+          onMouseLeave={(e) => (e.currentTarget.style = imageButtonStyle)} // بازگشت به استایل اصلی
+          onMouseDown={(e) => {
+            e.preventDefault();
+            handleImageInsert();
           }}
         >
           درج تصویر

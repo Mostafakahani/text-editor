@@ -1,6 +1,9 @@
 /* body {
   background-color: #1e212d;
 } */
+* {
+  direction: rtl;
+}
 
 .rdw-option-wrapper {
   border: 1px solid #5f5f5f !important;

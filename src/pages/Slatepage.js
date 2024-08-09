@@ -7,7 +7,6 @@ const SlateEditor = dynamic(() => import("./components/Slate"), {
 });
 
 const EditorPage = () => {
-  //   const initialValue =
   const [initialValue, setInitialValue] = useState([
     {
       type: "paragraph",
@@ -24,11 +23,12 @@ const EditorPage = () => {
       />
       <button onClick={() => console.log(initialValue)}>Log values</button>
       <div style={{ width: "100%", marginTop: 80 }}>
-        <div dangerouslySetInnerHTML={{ __html: serialize(initialValue) }} />;
+        <div dangerouslySetInnerHTML={{ __html: serialize(initialValue) }} />
       </div>
     </div>
   );
 };
+
 const serializeText = (node) => {
   let text = node.text;
 
@@ -71,22 +71,19 @@ const serialize = (nodes) => {
       }
       if (node.type === "heading-one") {
         const align = node.align || "flex-start"; // مقدار پیش‌فرض 'flex-start' است
-
-        return `<h1 style="display: flex; justify-content: ${align}; text-aling: ${align};">${node.children
+        return `<h1 style="display: flex; justify-content: ${align}; text-align: ${align};">${node.children
           .map((child) => serializeText(child))
           .join("")}</h1>`;
       }
       if (node.type === "heading-two") {
         const align = node.align || "flex-start"; // مقدار پیش‌فرض 'flex-start' است
-
-        return `<h2 style="display: flex; justify-content: ${align}; text-aling: ${align};">${node.children
+        return `<h2 style="display: flex; justify-content: ${align}; text-align: ${align};">${node.children
           .map((child) => serializeText(child))
           .join("")}</h2>`;
       }
       if (node.type === "heading-three") {
         const align = node.align || "flex-start"; // مقدار پیش‌فرض 'flex-start' است
-
-        return `<h3 style="display: flex; justify-content: ${align}; text-aling: ${align};">${node.children
+        return `<h3 style="display: flex; justify-content: ${align}; text-align: ${align};">${node.children
           .map((child) => serializeText(child))
           .join("")}</h3>`;
       }
@@ -96,26 +93,25 @@ const serialize = (nodes) => {
           .join("")}</code></pre>`;
       }
       if (node.type === "image") {
-        const width = node.width || "auto";
-        const height = node.height || "auto";
+        const width = node.size?.width || "auto";
+        const height = node.size?.height || "auto";
         const align = node.align || "flex-start"; // مقادیر پیش‌فرض
-        // تبدیل مقادیر flex به display: flex; justify-content مناسب
-        let textAlign;
-        switch (align) {
-          case "flex-start":
-            textAlign = "left";
-            break;
-          case "flex-end":
-            textAlign = "right";
-            break;
-          case "center":
-            textAlign = "center";
-            break;
-          default:
-            textAlign = "left"; // مقدار پیش‌فرض
-        }
-        return `<div style="display: flex; justify-content: ${textAlign};">
-                    <img src="${node.url}" alt="" style="width: ${width}; height: ${height};" />
+        // let textAlign;
+        // switch (align) {
+        //   case "flex-start":
+        //     textAlign = "left";
+        //     break;
+        //   case "flex-end":
+        //     textAlign = "right";
+        //     break;
+        //   case "center":
+        //     textAlign = "center";
+        //     break;
+        //   default:
+        //     textAlign = "left"; // مقدار پیش‌فرض
+        // }
+        return `<div style="display: flex; justify-content: ${align};">
+                    <img src="${node.url}" alt="" style="width: ${width}px; height: ${height}px;" />
                   </div>`;
       }
       return "";
