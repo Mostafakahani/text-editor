@@ -6,23 +6,31 @@ export default function MainPage() {
   const [textareaContent, setTextareaContent] = useState("");
   const [htmlValue, setHtmlValue] = useState("");
   const [a, setA] = useState(false);
+  const [sanitizedContent, setSanitizedContent] = useState("");
 
-  // زمانی که کاربر دکمه "ذخیره" را فشار دهد، محتوای ورودی به ادیتور منتقل می‌شود
+  useEffect(() => {
+    let DOMPurify;
+    import("isomorphic-dompurify").then((module) => {
+      DOMPurify = module.default;
+      setSanitizedContent(DOMPurify.sanitize(editorContent));
+    });
+  }, [editorContent]);
+
   const handleSave = () => {
     setA(true);
     setEditorContent(textareaContent);
   };
+
   useEffect(() => {
     if (a) {
       setA(false);
     }
   }, [a]);
-  // تبدیل محتوای ادیتور به HTML و نمایش آن در ورودی
+
   const handleConvertToHtml = () => {
     setTextareaContent(editorContent);
   };
 
-  // لاگ کردن داده‌های نهایی در کنسول
   const handleLogData = () => {
     console.log("Editor Content: ", editorContent);
     console.log("Textarea Content: ", textareaContent);
@@ -31,7 +39,6 @@ export default function MainPage() {
 
   return (
     <>
-      {/* ادیتور */}
       {!a && (
         <CustomEditor
           value={editorContent}
@@ -40,11 +47,9 @@ export default function MainPage() {
         />
       )}
 
-      {/* دکمه‌ها */}
       <button onClick={handleConvertToHtml}>تبدیل به HTML</button>
       <button onClick={handleLogData}>لاگ کردن داده‌ها</button>
 
-      {/* ورودی textarea */}
       <div style={{ width: "100%", marginTop: "20px" }}>
         <textarea
           value={textareaContent}
@@ -54,6 +59,10 @@ export default function MainPage() {
         <button onClick={handleSave}>ذخیره</button>
       </div>
 
+      <div
+        style={{ marginTop: "50px", border: "1px solid #ccc", padding: "10px" }}
+        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+      />
       <div
         style={{ marginTop: "50px", border: "1px solid #ccc", padding: "10px" }}
         dangerouslySetInnerHTML={{ __html: editorContent }}

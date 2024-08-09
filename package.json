@@ -9,12 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "dompurify": "^3.1.6",
     "draft-js": "^0.11.7",
     "draftjs-to-html": "^0.9.1",
+    "is-url": "^1.2.4",
+    "isomorphic-dompurify": "^2.14.0",
     "next": "^14.2.5",
-    "react": "^18",
-    "react-dom": "^18",
-    "react-draft-wysiwyg": "^1.15.0"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-draft-wysiwyg": "^1.15.0",
+    "slate": "^0.103.0",
+    "slate-react": "^0.107.1"
   },
   "devDependencies": {
     "eslint": "^8",
