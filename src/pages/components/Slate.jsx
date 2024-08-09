@@ -306,7 +306,14 @@ const SlateEditor = ({ initialValue, setInitialValue }) => {
   return (
     <Slate
       editor={editor}
-      initialValue={value}
+      initialValue={
+        value || [
+          {
+            type: "paragraph",
+            children: [{ text: "یک خط متن در یک پاراگراف." }],
+          },
+        ]
+      }
       onChange={(newValue) => {
         setValue(newValue);
         setInitialValue(newValue);
